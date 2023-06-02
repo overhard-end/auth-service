@@ -6,7 +6,7 @@ const userSchema = new mongoose.Schema(
     password: { type: String, required: true },
     role: { type: String, default: 'user' },
   },
-  { versionKey: false },
+  { versionKey: false, strict: true, strictQuery: false },
 );
 
 module.exports = mongoose.model('user', userSchema);
