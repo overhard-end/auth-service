@@ -16,6 +16,7 @@ class Controller {
   async registration(req, res) {
     try {
       const userData = getUserCredentials(req);
+      
       const result = await authService.register(userData);
       if (!result.success) return res.status(403).json({ msg: result.msg, param: result.param });
       res.status(201).json({ success: true, user: result.user.email });

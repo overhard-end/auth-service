@@ -3,6 +3,8 @@ const Token = require('../utils/token');
 const Hash = require('../utils/hash');
 const User = require('../models/user');
 
+
+
 async function createSession(data) {
   const tokens = Token.generateTokens(data.email);
   const session = {
@@ -16,12 +18,16 @@ async function createSession(data) {
 }
 class AuthService {
   async register(data) {
-    const user = await User.findOne({ email: data.email });
+    const user = await User.findOne({ email: data.email, });
     if (user) return { success: false, param: 'email', msg: 'User already registered' };
     const hashPassword = await Hash.createPasswordHash(data.password);
+    if(!hashPassword) return { success: false, param: 'password', msg: 'Something went wrong' };
+
     const newUser = await User.create({ email: data.email, password: hashPassword });
+    
     return { success: true, user: newUser };
   }
+
   async login(data) {
     const user = await User.findOne({ email: data.email });
     if (!user) return { success: false, param: 'email', msg: 'User not found' };
