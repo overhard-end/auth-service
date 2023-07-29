@@ -11,5 +11,7 @@ router.post('/login', authValidator, Controller.login);
 router.get('/token', Controller.refreshToken);
 router.get('/logout', checkToken, Controller.logout);
 router.get('/user', checkToken, userService.getUser);
+router.get('/verify', Controller.verifyEmail);
+
 
 module.exports = router;

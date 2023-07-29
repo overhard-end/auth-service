@@ -4,7 +4,6 @@ const Hash = require('../utils/hash');
 const User = require('../models/user');
 
 
-
 async function createSession(data) {
   const tokens = Token.generateTokens(data.email);
   const session = {
@@ -22,9 +21,7 @@ class AuthService {
     if (user) return { success: false, param: 'email', msg: 'User already registered' };
     const hashPassword = await Hash.createPasswordHash(data.password);
     if(!hashPassword) return { success: false, param: 'password', msg: 'Something went wrong' };
-
     const newUser = await User.create({ email: data.email, password: hashPassword });
-    
     return { success: true, user: newUser };
   }
 
