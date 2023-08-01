@@ -28,8 +28,10 @@ class AuthService {
   async login(data) {
     const user = await User.findOne({ email: data.email });
     if (!user) return { success: false, param: 'email', msg: 'User not found' };
+    if(!user.verified)return { success: false, param: 'email', msg: 'User email is not verified' };
     if (!(await Hash.comparePassword(user.password, data.password)))
       return { success: false, param: 'password', msg: 'Incorrect password' };
+
     const tokens = await createSession({
       email: user.email,
       _id: user._id,
@@ -40,6 +42,7 @@ class AuthService {
 
   async updateSession(token, fingerprint) {
     const session = await Session.findOne({ refreshToken: token }).lean();
+    console.log(session)
     if (!session) return { success: false, msg: 'Session not found', param: 'session' };
     const check = Token.verifyToken(token, 'refresh');
     if (!check) return { success: false, msg: 'Incorrect or expared token', param: 'token' };

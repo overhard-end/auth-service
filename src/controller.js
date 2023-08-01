@@ -17,30 +17,31 @@ class Controller {
   async registration(req, res) {
     try {
       const userData = getUserCredentials(req);
-      
       const result = await authService.register(userData);
       if (!result.success) return res.status(403).json({ msg: result.msg, param: result.param });
-      const token =   await emailService.createEmailToken(result.user._id)
-      if(!token)return res.status(403).json({message:'something went wrong saving the token for email'})
-
-     const isEmailSended =  await emailService.sendVerifyEmail(result.user.email,token.token,token.userId)
-     if(!isEmailSended) return res.status(403).json({message:'something went wrong with seinding email'})
-      res.status(201).json({ success: true, user: result.user.email,msg:'check you email where were sended email confirm' });
+      const isSended = await emailService.createAndSendToken(result.user._id,result.user.email)
+     if(!isSended) return res.status(500).json('Something went wrong');
+      res.status(201).json({ success: true, user: result.user.email,msg:'Check your email box to confirm your profile' });
     } catch (error) {
       console.log(error);
       return res.status(500).json('Something went wrong');
     }
   }
   async verifyEmail(req,res){
-    const userId = req.query.id
+    try {
+      const userId = req.query.id
     const token = req.query.token
     if(!userId||!token) return res.status(400)
     const result =  await emailService.verifyEmail(userId,token)
+    if(!result) return res.status(400).json({success:false,msg:'Invalid link, try again'})
+    const pathName = '/auth'
+    res.writeHead(301,{Location:process.env.CLIENT_URL + pathName} )
+    res.end()
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json('Something went wrong');
+    }
     
-    if(!result)return res.status(400).json({msg:'invalid link, try again'})
-    console.log(result)
-    res.write("<h1>your email wan confir</h1>")
-
   }
   async login(req, res) {
     try {

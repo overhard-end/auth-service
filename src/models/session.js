@@ -4,10 +4,10 @@ const Session = new mongoose.Schema(
   {
     refreshToken: { type: String, required: true },
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'user' },
-    expiresIn: { type: Number, required: true },
+    createdAt: { type: Date, expires:process.env.TOKEN_EXPIRES_TIME },
     fingerprint: { type: String, required: true },
-    createdAt: { type: Date },
   },
-  { versionKey: false, strict: true, strictQuery: false },
+  { versionKey: false, strict: true, strictQuery: false,timestamps:true },
+  
 );
 module.exports = mongoose.model('session', Session);
