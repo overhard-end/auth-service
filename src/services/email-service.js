@@ -1,7 +1,6 @@
 const nodemailer = require("nodemailer");
-const TokenModel = require('../models/token');
-const  Uuid = require('uuid');
 const User = require("../models/user");
+const Token = require("../utils/token");
 
 
 
@@ -22,7 +21,10 @@ const sendEmail = async (email, link) => {
       to: email,
       subject: 'Verify coolCloud email',
       text: 'For confirm yor email, please press on the link',
-      html:`<a href="${link}">Verify now</a>`
+      html:`<div>
+      <h1>${link}</h1>
+      <a href="${link}">Verify now</a>
+      </div>`
     })
     return true
   } catch (error) {
@@ -33,22 +35,18 @@ const sendEmail = async (email, link) => {
 
 class EmailService{
   createAndSendToken = async (userId,email)=>{
-  const token = await TokenModel.create({userId:userId,token:Uuid.v4()},)
-  if(!token) return false
-   const link = new URL(`${process.env.BASE_URL}/api/verify/`)
-    link.searchParams.append('id',userId)
-    link.searchParams.append('token',token.token)
+  const token =  Token.createEmailVerifyToken(userId)
+  const link = new URL(`${process.env.BASE_URL}/api/verify/`)
+  link.searchParams.append('token',token)
   return await sendEmail(email,link)
   }
-async verifyEmail(userId,token){
-  const user = await User.findOne({_id:userId})
+async verifyEmail(token){
+  const isVerified = Token.verifyEmailToken(token)
+  console.log(isVerified)
+  if(!isVerified) return false
+  const user = await User.findOneAndUpdate({_id:isVerified.userId},{verified:true})
+  console.log('verifyEmail',user)
   if(!user) return false
-  const tokenFromBD = await TokenModel.findOne({token:token})
-  if(!tokenFromBD)return false
-  if(!tokenFromBD.token === token) return false
-  await User.updateOne({ _id:userId}, { $set: { verified: true } })
-  await TokenModel.deleteOne({token:token})
-  
   return true
 }
 }

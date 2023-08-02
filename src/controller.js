@@ -20,7 +20,7 @@ class Controller {
       const result = await authService.register(userData);
       if (!result.success) return res.status(403).json({ msg: result.msg, param: result.param });
       const isSended = await emailService.createAndSendToken(result.user._id,result.user.email)
-     if(!isSended) return res.status(500).json('Something went wrong');
+      if(!isSended) return res.status(500).json('Something went wrong');
       res.status(201).json({ success: true, user: result.user.email,msg:'Check your email box to confirm your profile' });
     } catch (error) {
       console.log(error);
@@ -29,10 +29,10 @@ class Controller {
   }
   async verifyEmail(req,res){
     try {
-      const userId = req.query.id
     const token = req.query.token
-    if(!userId||!token) return res.status(400)
-    const result =  await emailService.verifyEmail(userId,token)
+    if(!token) return res.status(400)
+    console.log('controler',token)
+    const result = await emailService.verifyEmail(token)
     if(!result) return res.status(400).json({success:false,msg:'Invalid link, try again'})
     const pathName = '/auth'
     res.writeHead(301,{Location:process.env.CLIENT_URL + pathName} )

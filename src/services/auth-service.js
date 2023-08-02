@@ -2,6 +2,7 @@ const Session = require('../models/session');
 const Token = require('../utils/token');
 const Hash = require('../utils/hash');
 const User = require('../models/user');
+const emailService = require('./email-service');
 
 
 async function createSession(data) {
@@ -9,7 +10,6 @@ async function createSession(data) {
   const session = {
     refreshToken: tokens.refreshToken,
     userId: data._id,
-    expiresIn: process.env.TOKEN_EXPIRES_TIME,
     fingerprint: data.fingerprint,
   };
   await Session.create(session);
@@ -28,7 +28,11 @@ class AuthService {
   async login(data) {
     const user = await User.findOne({ email: data.email });
     if (!user) return { success: false, param: 'email', msg: 'User not found' };
-    if(!user.verified)return { success: false, param: 'email', msg: 'User email is not verified' };
+    if(!user.verified){
+      await emailService.createAndSendToken(user._id,user.email)
+      return { success: false, param: 'email', msg: 'User email is not verified, please check your email to confirm ' };
+      
+    }
     if (!(await Hash.comparePassword(user.password, data.password)))
       return { success: false, param: 'password', msg: 'Incorrect password' };
 
