@@ -78,19 +78,12 @@ If you examine the token payload, it will resemble the following:
   "iat": 1543995470,
   "user": 
     {
-      "email": "artifact-repository",
-      "id": "org1/repo1",
+      "email":someemail@.com,
+      "id": "83i8h9f89h2938hr",
       
     }
-  
 }
 ```
 
 
-
-## Auth flow
-
-The following diagram shows an example of how JWT auth work between any web services :
-
-<img src="https://www.google.com/url?sa=i&url=https%3A%2F%2Fdev.to%2Fbehalf%2Fauthentication-authorization-in-microservices-architecture-part-i-2cn0&psig=AOvVaw2Fb_3XLRR99aM8cnw_9uPW&ust=1691139907222000&source=images&cd=vfe&opi=89978449&ved=0CBEQjRxqFwoTCJCJzJ2RwIADFQAAAAAdAAAAABAE">
 
